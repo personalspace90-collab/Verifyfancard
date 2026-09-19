@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Membership Verification</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@500;600&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --navy: #1A2B42;
+    --slate: #7C8CA5;
+    --parchment: #F1EDE4;
+    --brass: #A6873B;
+    --ink: #23262B;
+    --line: #D9D3C4;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--parchment);
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .certificate {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(26,43,66,0.08);
+  }
+
+  .band {
+    background: var(--navy);
+    padding: 22px 28px;
+    color: #fff;
+  }
+
+  .band .org {
+    font-family: 'Source Serif 4', serif;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    color: var(--slate);
+    margin: 0 0 4px 0;
+  }
+
+  .band h1 {
+    font-family: 'Source Serif 4', serif;
+    font-weight: 600;
+    font-size: 21px;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .body-content {
+    padding: 28px;
+  }
+
+  .photo {
+    width: 88px;
+    height: 88px;
+    margin: 0 auto 16px auto;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    background: var(--parchment);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .photo-initials {
+    font-family: 'Source Serif 4', serif;
+    font-size: 28px;
+    color: var(--slate);
+  }
+
+  .seal {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 18px auto;
+    border-radius: 50%;
+    border: 2px solid var(--brass);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.7);
+    animation: sealIn 0.5s ease-out 0.15s forwards;
+  }
+
+  @keyframes sealIn {
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .seal svg { width: 24px; height: 24px; }
+
+  .status {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--brass);
+    letter-spacing: 0.03em;
+    margin-bottom: 22px;
+  }
+
+  .field {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .field:last-child { border-bottom: none; }
+
+  .field-label {
+    font-size: 12px;
+    color: var(--slate);
+    margin-bottom: 4px;
+  }
+
+  .field-value {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .footnote {
+    text-align: center;
+    font-size: 12px;
+    color: var(--slate);
+    margin-top: 22px;
+  }
+
+  .not-found {
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .not-found .field-value {
+    color: #A33;
+  }
+</style>
+</head>
+<body>
+
+  <div class="certificate">
+    <div class="band">
+      <h1>Membership Verification</h1>
+    </div>
+    <div class="body-content" id="content">
+      <!-- filled by script -->
+    </div>
+  </div>
+
+<script>
+  // Add one entry per person here. Same page, same code — just extend this object
+  // when you have the other 15 people's details.
+  const MEMBERS = {
+    "1": {
+      name: "Ooi Chiew Fong",
+      address: "2 East Nether Blelock, Bankfoot, Perth PH1 4EE",
+      memberSince: null, // null = use today's date automatically at first view; replace with a fixed date string once issued, e.g. "19 September 2026"
+      photo: null // paste an image URL here once you have one, e.g. "https://yoursite.com/photos/chiew-fong.jpg"
+    }
+  };
+
+  function todayFormatted() {
+    const d = new Date();
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  const content = document.getElementById('content');
+  const member = id ? MEMBERS[id] : null;
+
+  function getInitials(name) {
+    return name.split(' ').map(part => part[0]).join('').slice(0, 2).toUpperCase();
+  }
+
+  if (member) {
+    const since = member.memberSince || todayFormatted();
+    const photoHtml = member.photo
+      ? `<img src="${member.photo}" alt="${member.name}">`
+      : `<span class="photo-initials">${getInitials(member.name)}</span>`;
+    content.innerHTML = `
+      <div class="photo">${photoHtml}</div>
+      <div class="seal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#A6873B" stroke-width="2">
+          <path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p class="status">Verified &mdash; active member</p>
+      <div class="field">
+        <div class="field-label">Name</div>
+        <div class="field-value">${member.name}</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Address</div>
+        <div class="field-value">${member.address}</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Member since</div>
+        <div class="field-value">${since}</div>
+      </div>
+      <p class="footnote">This card was verified by scanning its official QR code.</p>
+    `;
+  } else {
+    content.innerHTML = `
+      <div class="not-found">
+        <div class="field-label">Status</div>
+        <div class="field-value">Card not recognised</div>
+        <p class="footnote">This QR code could not be matched to a record.</p>
+      </div>
+    `;
+  }
+</script>
+
+</body>
+</html>
